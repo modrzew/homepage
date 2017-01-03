@@ -1,5 +1,4 @@
-import os
-import os.path
+import json
 import random
 from collections import namedtuple
 from datetime import datetime, timedelta
@@ -37,11 +36,14 @@ def index():
 @cache('bg', 60)
 def random_background():
     """Redirect to random background image chosen from directory"""
-    dir_path = os.path.join(app.static_folder, 'images/backgrounds')
-    files = os.listdir(dir_path)
-    chosen = random.choice(files)
-    path = os.path.join('images/backgrounds', chosen)
-    return redirect(url_for('static', filename=path))
+    try:
+        with open('./urls.json') as f:
+            urls = json.loads(f.read())
+    except IOError:
+        # Fallback
+        return redirect(url_for('static', filename='images/background.jpg'))
+    url = random.choice(urls)
+    return redirect(url)
 
 
 if __name__ == "__main__":
